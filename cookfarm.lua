@@ -346,154 +346,7 @@ local function ExecuteScript()
 
         return Page
     end
--- [[ BYTEE HUB V3 - PART 3 / 7 ]] --
-local function ExecuteScript()
-    if CoreGui:FindFirstChild("ByteeHub") then
-        CoreGui:FindFirstChild("ByteeHub"):Destroy()
-    end
-
-    local MainGui = Instance.new("ScreenGui")
-    MainGui.Name = "ByteeHub"
-    MainGui.Parent = CoreGui
-
-    -- Açılış Bildirim Kartı
-    local NotifFrame = Instance.new("Frame", MainGui)
-    NotifFrame.Size = UDim2.new(0, 340, 0, 75)
-    NotifFrame.Position = UDim2.new(1, -355, 1, -85)
-    NotifFrame.BackgroundColor3 = Config.BgColor
-    NotifFrame.BackgroundTransparency = 0.1
-    NotifFrame.BorderSizePixel = 0
-    Instance.new("UICorner", NotifFrame).CornerRadius = UDim.new(0, 8)
-
-    local NotifStroke = Instance.new("UIStroke", NotifFrame)
-    NotifStroke.Color = Config.WarningYellow
-    NotifStroke.Transparency = 0.2
-    NotifStroke.Thickness = 1.5
-
-    local NotifTitle = Instance.new("TextLabel", NotifFrame)
-    NotifTitle.Size = UDim2.new(1, -20, 0, 20)
-    NotifTitle.Position = UDim2.new(0, 15, 0, 8)
-    NotifTitle.BackgroundTransparency = 1
-    NotifTitle.Text = "Bytee Hub V3 Yüklendi"
-    NotifTitle.TextColor3 = Config.WarningYellow
-    NotifTitle.Font = Enum.Font.GothamBold
-    NotifTitle.TextSize = 11
-    NotifTitle.TextXAlignment = Enum.TextXAlignment.Left
-
-    local NotifDesc = Instance.new("TextLabel", NotifFrame)
-    NotifDesc.Size = UDim2.new(1, -20, 0, 40)
-    NotifDesc.Position = UDim2.new(0, 15, 0, 26)
-    NotifDesc.BackgroundTransparency = 1
-    NotifDesc.Text = LocalPlayer.DisplayName .. ", harita kontrolleri güvenli modda çalıştırıldı."
-    NotifDesc.TextColor3 = Config.TextSecondary
-    NotifDesc.Font = Enum.Font.Gotham
-    NotifDesc.TextSize = 9.5
-    NotifDesc.TextWrapped = true
-    NotifDesc.TextXAlignment = Enum.TextXAlignment.Left
-
-    task.delay(4, function()
-        if NotifFrame and NotifFrame.Parent then NotifFrame:Destroy() end
-    end)
-
-    -- Ana Pencere
-    local MainFrame = Instance.new("Frame", MainGui)
-    MainFrame.Name = "MainFrame"
-    MainFrame.Size = Config.WindowSize
-    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-    MainFrame.BackgroundColor3 = Config.BgColor
-    MainFrame.BackgroundTransparency = 0.12
-    MainFrame.BorderSizePixel = 0
-    MainFrame.ClipsDescendants = true
-    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
-
-    local TopBar = Instance.new("Frame", MainFrame)
-    TopBar.Size = UDim2.new(1, 0, 0, 38)
-    TopBar.BackgroundTransparency = 1
-
-    local Title = Instance.new("TextLabel", TopBar)
-    Title.Text = "Bytee Hub V3"
-    Title.Size = UDim2.new(0, 200, 1, 0)
-    Title.Position = UDim2.new(0, 15, 0, 0)
-    Title.BackgroundTransparency = 1
-    Title.TextColor3 = Config.TextPrimary
-    Title.Font = Enum.Font.GothamBold
-    Title.TextSize = 14
-    Title.TextXAlignment = Enum.TextXAlignment.Left
-
-    local Sidebar = Instance.new("Frame", MainFrame)
-    Sidebar.Size = UDim2.new(0, 140, 1, -48)
-    Sidebar.Position = UDim2.new(0, 10, 0, 38)
-    Sidebar.BackgroundColor3 = Config.SidebarColor
-    Sidebar.BackgroundTransparency = 0.25
-    Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 8)
-
-    local TabContainer = Instance.new("ScrollingFrame", Sidebar)
-    TabContainer.Size = UDim2.new(1, -6, 1, -10)
-    TabContainer.Position = UDim2.new(0, 3, 0, 5)
-    TabContainer.BackgroundTransparency = 1
-    TabContainer.ScrollBarThickness = 0
-    TabContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
-
-    local TabList = Instance.new("UIListLayout", TabContainer)
-    TabList.SortOrder = Enum.SortOrder.LayoutOrder
-    TabList.Padding = UDim.new(0, 4)
-
-    local PagesContainer = Instance.new("Frame", MainFrame)
-    PagesContainer.Size = UDim2.new(1, -170, 1, -48)
-    PagesContainer.Position = UDim2.new(0, 160, 0, 38)
-    PagesContainer.BackgroundTransparency = 1
-
-    local Tabs, Pages = {}, {}
-
-    local function CreateTab(name, layoutOrder)
-        local TabBtn = Instance.new("TextButton", TabContainer)
-        TabBtn.Size = UDim2.new(1, 0, 0, 28)
-        TabBtn.BackgroundColor3 = (layoutOrder == 1) and Config.ContainerActive or Config.ContainerColor
-        TabBtn.BackgroundTransparency = 0.2
-        TabBtn.Text = "      " .. name
-        TabBtn.TextColor3 = Config.TextPrimary
-        TabBtn.Font = Enum.Font.GothamMedium
-        TabBtn.TextSize = 11
-        TabBtn.TextXAlignment = Enum.TextXAlignment.Left
-        TabBtn.LayoutOrder = layoutOrder
-        Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 6)
-
-        if CategoryIcons[name] then
-            local IconImg = Instance.new("ImageLabel", TabBtn)
-            IconImg.Size = UDim2.new(0, 16, 0, 16)
-            IconImg.Position = UDim2.new(0, 8, 0.5, -8)
-            IconImg.BackgroundTransparency = 1
-            IconImg.Image = CategoryIcons[name]
-            IconImg.ImageColor3 = Config.TextPrimary
-        end
-
-        local Page = Instance.new("ScrollingFrame", PagesContainer)
-        Page.Size = UDim2.new(1, 0, 1, 0)
-        Page.BackgroundTransparency = 1
-        Page.ScrollBarThickness = 2
-        Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
-        Page.Visible = (layoutOrder == 1)
-
-        local PageLayout = Instance.new("UIListLayout", Page)
-        PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        PageLayout.Padding = UDim.new(0, 6)
-
-        Tabs[name] = TabBtn
-        Pages[name] = Page
-
-        TabBtn.MouseButton1Click:Connect(function()
-            for _, btn in pairs(Tabs) do
-                TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Config.ContainerColor}):Play()
-            end
-            for _, p in pairs(Pages) do p.Visible = false end
-            TweenService:Create(TabBtn, TweenInfo.new(0.2), {BackgroundColor3 = Config.ContainerActive}):Play()
-            Page.Visible = true
-        end)
-
-        return Page
-    end
--- [[ BYTEE HUB V3 - PART 4 / 7 ]] --
+    -- [[ BYTEE HUB V3 - PART 4 / 7 ]] --
     local DashboardPage   = CreateTab("Dashboard", 1)
     local InfoPage        = CreateTab("Information", 2)
     local FarmPage        = CreateTab("Farm", 3)
@@ -591,7 +444,7 @@ local function ExecuteScript()
 
     local JanitorCategory = CreateAccordionCategory(FarmPage, "Temizlikçi (Janitor) Auto Farm")
     local MinerCategory   = CreateAccordionCategory(FarmPage, "Madenci (Miner) Auto Farm")
--- [[ BYTEE HUB V3 - PART 5 / 7 ]] --
+    -- [[ BYTEE HUB V3 - PART 5 / 7 ]] --
     local function CreateToggle(parentFrame, text, defaultState, callback)
         local ToggleFrame = Instance.new("Frame", parentFrame)
         ToggleFrame.Size = UDim2.new(1, -12, 0, 28)
@@ -668,7 +521,7 @@ local function ExecuteScript()
             if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
         end
     end)
--- [[ BYTEE HUB V3 - PART 6 / 7 ]] --
+    -- [[ BYTEE HUB V3 - PART 6 / 7 ]] --
     -- ESP Modülleri
     CreateToggle(ESPPage, "Box ESP", false, function(val)
         HubSettings.BoxEsp = val
@@ -726,7 +579,7 @@ local function ExecuteScript()
     StaffStatus.TextSize = 10
     StaffStatus.TextWrapped = true
     StaffStatus.TextXAlignment = Enum.TextXAlignment.Left
--- [[ BYTEE HUB V3 - PART 7 / 7 ]] --
+    -- [[ BYTEE HUB V3 - PART 7 / 7 ]] --
     local function CreateButton(parentFrame, text, color, callback)
         local Btn = Instance.new("TextButton", parentFrame)
         Btn.Size = UDim2.new(1, -12, 0, 28)
@@ -755,9 +608,8 @@ local function ExecuteScript()
         MainGui:Destroy()
     end)
 
-        MakeDraggable(MainFrame)
+    MakeDraggable(MainFrame)
 end
 
 -- Scripti güvenli modda çalıştır
 ExecuteScript()
-    
