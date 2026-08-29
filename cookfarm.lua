@@ -755,8 +755,9 @@ local function ExecuteScript()
         MainGui:Destroy()
     end)
 
-    MakeDraggable(MainFrame)
+        MakeDraggable(MainFrame)
 end
 
 -- Scripti güvenli modda çalıştır
 ExecuteScript()
+    
