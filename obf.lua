@@ -5,22 +5,28 @@ local RunService = cloneref(game:GetService("RunService"))
 local Players = cloneref(game:GetService("Players"))
 local Workspace = cloneref(game:GetService("Workspace"))
 local VirtualInputManager = cloneref(game:GetService("VirtualInputManager"))
-local CoreGui = cloneref(game:GetService("CoreGui"))
 local LocalPlayer = Players.LocalPlayer
 
 local ToolEvent = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Tool"):WaitForChild("Event")
 local MineRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Tool"):WaitForChild("Event")
 
 --------------------------------------------------------------------------------
--- KÜÇÜK / MİNNİK UI (MOBILE & PC COMPATIBLE)
+-- KÜÇÜK / MİNNİK UI (XENO & MOBILE COMPATIBLE)
 --------------------------------------------------------------------------------
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ByteeHubMiniUI"
+ScreenGui.Name = "LevisHubMiniUI"
 ScreenGui.ResetOnSpawn = false
-pcall(function() ScreenGui.Parent = CoreGui end)
-if not ScreenGui.Parent then ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end
 
--- Ana Çerçeve (Boyut: 360x220 - Mobil için çok ideal ve küçük)
+-- Xeno için PlayerGui öncelikli koruma
+local parentTarget = LocalPlayer:FindFirstChildOfClass("PlayerGui") or game:GetService("CoreGui")
+ScreenGui.Parent = parentTarget
+
+-- Eski UI varsa temizle
+if parentTarget:FindFirstChild("LevisHubMiniUI") and parentTarget:FindFirstChild("LevisHubMiniUI") ~= ScreenGui then
+    parentTarget:FindFirstChild("LevisHubMiniUI"):Destroy()
+end
+
+-- Ana Çerçeve
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 360, 0, 220)
@@ -46,19 +52,19 @@ TitleCorner.CornerRadius = UDim.new(0, 8)
 local TitleText = Instance.new("TextLabel", TitleBar)
 TitleText.Size = UDim2.new(1, -30, 1, 0)
 TitleText.Position = UDim2.new(0, 8, 0, 0)
-TitleText.Text = "Bytee Hub | Mini UI"
+TitleText.Text = "Levis Hub | Mini UI"
 TitleText.TextColor3 = Color3.fromRGB(255, 255, 255)
 TitleText.TextSize = 12
 TitleText.Font = Enum.Font.SourceSansBold
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 TitleText.BackgroundTransparency = 1
 
--- UI Kapat/Aç Butonu (Mobil için küçük ekrana sabitleme)
+-- UI Kapat/Aç Butonu
 local ToggleUIBtn = Instance.new("TextButton", ScreenGui)
 ToggleUIBtn.Size = UDim2.new(0, 50, 0, 24)
 ToggleUIBtn.Position = UDim2.new(0, 10, 0, 10)
 ToggleUIBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
-ToggleUIBtn.Text = "HUB"
+ToggleUIBtn.Text = "LEVIS"
 ToggleUIBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleUIBtn.TextSize = 11
 ToggleUIBtn.Font = Enum.Font.SourceSansBold
@@ -85,7 +91,7 @@ ContentContainer.Size = UDim2.new(1, -95, 1, -33)
 ContentContainer.Position = UDim2.new(0, 95, 0, 31)
 ContentContainer.BackgroundTransparency = 1
 
-local Tabs = {}
+_G.LevisTabs = {}
 local function CreateTab(name)
     local TabBtn = Instance.new("TextButton", TabSidebar)
     TabBtn.Size = UDim2.new(1, -8, 0, 26)
@@ -102,6 +108,8 @@ local function CreateTab(name)
     Page.BackgroundTransparency = 1
     Page.BorderSizePixel = 0
     Page.ScrollBarThickness = 3
+    Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    Page.CanvasSize = UDim2.new(0, 0, 0, 0)
     Page.Visible = false
 
     local PageList = Instance.new("UIListLayout", Page)
@@ -109,7 +117,7 @@ local function CreateTab(name)
     PageList.Padding = UDim.new(0, 4)
 
     TabBtn.MouseButton1Click:Connect(function()
-        for _, t in pairs(Tabs) do
+        for _, t in pairs(_G.LevisTabs) do
             t.Page.Visible = false
             t.Btn.TextColor3 = Color3.fromRGB(180, 180, 180)
             t.Btn.BackgroundColor3 = Color3.fromRGB(32, 32, 38)
@@ -119,11 +127,11 @@ local function CreateTab(name)
         TabBtn.BackgroundColor3 = Color3.fromRGB(50, 100, 220)
     end)
 
-    Tabs[name] = {Btn = TabBtn, Page = Page}
+    _G.LevisTabs[name] = {Btn = TabBtn, Page = Page}
     return Page
 end
 
-local function AddToggle(page, text, default, callback)
+_G.AddToggle = function(page, text, default, callback)
     local Toggle = Instance.new("TextButton", page)
     Toggle.Size = UDim2.new(1, -6, 0, 24)
     Toggle.BackgroundColor3 = default and Color3.fromRGB(40, 120, 60) or Color3.fromRGB(35, 35, 42)
@@ -142,7 +150,7 @@ local function AddToggle(page, text, default, callback)
     end)
 end
 
-local function AddButton(page, text, callback)
+_G.AddButton = function(page, text, callback)
     local Btn = Instance.new("TextButton", page)
     Btn.Size = UDim2.new(1, -6, 0, 24)
     Btn.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
@@ -155,18 +163,11 @@ local function AddButton(page, text, callback)
     Btn.MouseButton1Click:Connect(callback)
 end
 
--- TABS TANIMLAMA
-local FarmPage = CreateTab("Auto Farm")
-local EatPage = CreateTab("Auto Eat")
-local CombatPage = CreateTab("Combat")
-
--- Varsayılan sekmeyi aç
-Tabs["Auto Farm"].Page.Visible = true
-Tabs["Auto Farm"].Btn.BackgroundColor3 = Color3.fromRGB(50, 100, 220)
-Tabs["Auto Farm"].Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-
+_G.FarmPage = CreateTab("Auto Farm")
+_G.EatPage = CreateTab("Auto Eat")
+_G.CombatPage = CreateTab("Combat")
 --------------------------------------------------------------------------------
--- 1. AUTO EAT / DRINK MANTIĞI
+-- AUTO EAT MANTIĞI
 --------------------------------------------------------------------------------
 local FOOD_TOOLS = { CerealBar = true, FoodPlate = true, Popcorn = true }
 local DRINK_TOOLS = { WaterCup = true, Soda = true, BloxyCola = true }
@@ -296,13 +297,13 @@ task.spawn(function()
     end
 end)
 
-AddToggle(EatPage, "Auto Eat / Drink", false, function(v) AutoHungerState.Enabled = v end)
---------------------------------------------------------------------------------
--- 2. AUTO FARM MANTIĞI
---------------------------------------------------------------------------------
-local FarmState = { AutoCook = false, AutoFish = false, AutoSell = false, SellInterval = 20 }
+_G.AddToggle(_G.EatPage, "Auto Eat / Drink", false, function(v) AutoHungerState.Enabled = v end)
 
--- AUTO COOK
+--------------------------------------------------------------------------------
+-- AUTO COOK & FISH
+--------------------------------------------------------------------------------
+_G.FarmState = { AutoCook = false, AutoFish = false, AutoSell = false, SellInterval = 20 }
+
 local farmSteps = {
     {name = "Cut", cframe = CFrame.new(43.00, 7.54, -298.80), path = "Cut"},
     {name = "Cook", cframe = CFrame.new(37.12, 7.54, -297.77), path = "Cook"},
@@ -332,9 +333,9 @@ end
 
 task.spawn(function()
     while true do
-        if FarmState.AutoCook then
+        if _G.FarmState.AutoCook then
             for index, step in ipairs(farmSteps) do
-                if not FarmState.AutoCook then break end
+                if not _G.FarmState.AutoCook then break end
                 local char = LocalPlayer.Character
                 local rootPart = char and char:FindFirstChild("HumanoidRootPart")
                 if rootPart then
@@ -350,7 +351,6 @@ task.spawn(function()
     end
 end)
 
--- AUTO FISH
 local FishingSystem = ReplicatedStorage:WaitForChild("FishingSystem")
 local FishingModules = FishingSystem:WaitForChild("FishingModules")
 local MinigameSystem = require(FishingModules:WaitForChild("MinigameSystem"))
@@ -400,7 +400,7 @@ end
 
 local lastClick = 0
 RunService.Heartbeat:Connect(function()
-   if not FarmState.AutoFish or not MinigameSystem:IsActive() then return end
+   if not _G.FarmState.AutoFish or not MinigameSystem:IsActive() then return end
    pcall(function()
        local phase = MinigameSystem:GetPhase()
        if phase == "shake" then
@@ -424,13 +424,13 @@ end)
 task.spawn(function()
    while true do
        task.wait(0.1)
-       if not FarmState.AutoFish then continue end
+       if not _G.FarmState.AutoFish then continue end
        pcall(function()
            if MinigameSystem:IsActive() then
-               while MinigameSystem:IsActive() and FarmState.AutoFish do task.wait(0.1) end
+               while MinigameSystem:IsActive() and _G.FarmState.AutoFish do task.wait(0.1) end
                task.wait(0.5)
            end
-           if not FarmState.AutoFish then return end
+           if not _G.FarmState.AutoFish then return end
            local character = LocalPlayer.Character
            local humanoid = character and character:FindFirstChildOfClass("Humanoid")
            if not character or not humanoid or humanoid.Health <= 0 then task.wait(1) return end
@@ -447,11 +447,10 @@ end)
 
 task.spawn(function()
    while true do
-       task.wait(FarmState.SellInterval)
-       if FarmState.AutoSell then pcall(function() FishingSystem.InventoryEvents.Inventory_SellAll:InvokeServer() end) end
+       task.wait(_G.FarmState.SellInterval)
+       if _G.FarmState.AutoSell then pcall(function() FishingSystem.InventoryEvents.Inventory_SellAll:InvokeServer() end) end
    end
 end)
-
 -- AUTO MINE
 local RocksFolder = Workspace:WaitForChild("Tasks"):WaitForChild("Prisoner"):WaitForChild("Rocks")
 local AutoMine = { IsActive = false, NoclipConnection = nil, RunningThread = nil }
@@ -602,22 +601,29 @@ task.spawn(function()
     end
 end)
 
--- ÖZELLİKLERİ MİNİ UI'A BAĞLAMA
-AddToggle(FarmPage, "Auto Fish", false, function(v)
-    FarmState.AutoFish = v
+-- ÖZELLİKLERİ MİNİ UI'A BAĞLAMA (BUTONLAR)
+_G.AddToggle(_G.FarmPage, "Auto Fish", false, function(v)
+    _G.FarmState.AutoFish = v
     if not v then
         local char = LocalPlayer.Character
         local humanoid = char and char:FindFirstChildOfClass("Humanoid")
         if humanoid then humanoid.WalkSpeed = 16 end
     end
 end)
-AddToggle(FarmPage, "Auto Sell Fish", false, function(v) FarmState.AutoSell = v end)
-AddToggle(FarmPage, "Auto Cook", false, function(v) FarmState.AutoCook = v end)
-AddToggle(FarmPage, "Auto Mine", false, function(v) if v then AutoMine.Start() else AutoMine.Stop() end end)
-AddToggle(FarmPage, "Auto Trash", false, function(v) if v then AutoTrash.Start() else AutoTrash.Stop() end end)
-AddToggle(FarmPage, "Auto Janitor", false, function(v) farmingJanitor = v end)
+_G.AddToggle(_G.FarmPage, "Auto Sell Fish", false, function(v) _G.FarmState.AutoSell = v end)
+_G.AddToggle(_G.FarmPage, "Auto Cook", false, function(v) _G.FarmState.AutoCook = v end)
+_G.AddToggle(_G.FarmPage, "Auto Mine", false, function(v) if v then AutoMine.Start() else AutoMine.Stop() end end)
+_G.AddToggle(_G.FarmPage, "Auto Trash", false, function(v) if v then AutoTrash.Start() else AutoTrash.Stop() end end)
+_G.AddToggle(_G.FarmPage, "Auto Janitor", false, function(v) farmingJanitor = v end)
 
-AddButton(CombatPage, "Load Mobile Aimbot", function()
+_G.AddButton(_G.CombatPage, "Load Mobile Aimbot", function()
     loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Aimbot-Mobile-34677"))()
 end)
 
+-- Varsayılan Sekmeyi Aç
+task.defer(function()
+    for _, t in pairs(_G.LevisTabs) do t.Page.Visible = false end
+    _G.LevisTabs["Auto Farm"].Page.Visible = true
+    _G.LevisTabs["Auto Farm"].Btn.BackgroundColor3 = Color3.fromRGB(50, 100, 220)
+    _G.LevisTabs["Auto Farm"].Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+end)
